@@ -24,4 +24,5 @@
 
 - (IBAction)onStartPressed:(id)sender;
 - (IBAction)onResetPressed:(id)sender;
+- (IBAction)onClearPressed:(id)sender;
 @end

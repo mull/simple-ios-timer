@@ -121,6 +121,12 @@
   pauseTime = 0;
 }
 
+- (IBAction)onClearPressed:(id)sender
+{
+  [loggedTimes removeAllObjects];
+  [self.tableView reloadData];
+}
+
 - (void)startTimer
 {
   self.startDate = [NSDate date];
