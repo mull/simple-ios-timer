@@ -8,6 +8,8 @@
 
 #import "ViewController.h"
 
+#define FILE_NAME @"loggedTimes.plist"
+
 @interface ViewController ()
 @end
 
@@ -16,10 +18,44 @@
   BOOL isRunning;
   int numberOfLogs;
   int continuingForLog;
-  NSMutableArray *loggedTimes;
   double pauseTime;
   
 }
+
+@synthesize loggedTimes;
+
+- (void)writeToLog
+{
+  NSString *path = [self getFullDocumentPath:FILE_NAME];
+  [self.loggedTimes writeToFile:path atomically:NO];
+}
+
+- (NSMutableArray *)loggedTimes
+{
+  if (!loggedTimes) {
+    NSString *path = [self getFullDocumentPath:FILE_NAME];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:path])
+    {
+      NSLog(@"Exists!");
+      loggedTimes = [[NSMutableArray alloc] initWithContentsOfFile:path];
+    } else {
+      NSLog(@"Does not exist!");
+      loggedTimes = [[NSMutableArray alloc] initWithCapacity:5];
+    }
+
+  }
+  
+  return loggedTimes;
+}
+
+- (NSString *)getFullDocumentPath:(NSString *)fileName
+{
+  NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+  NSString *docDir = [paths objectAtIndex:0];
+  NSString *fullPath = [docDir stringByAppendingString:fileName];
+  return fullPath;
+}
+
 
 - (NSString *)timeString
 {
@@ -48,6 +84,7 @@
   NSString *currentTime = [self timeString];
   [loggedTimes addObject:currentTime];
   
+  [self writeToLog];
   [self.tableView reloadData];
 }
 
@@ -60,6 +97,8 @@
     [loggedTimes replaceObjectAtIndex:([loggedTimes count] - 1)
                            withObject:currentTime];
     
+    NSString *path = [self getFullDocumentPath:FILE_NAME];
+    [self.loggedTimes writeToFile:path atomically:NO];
     [self.tableView reloadData];
   }
 }
@@ -124,6 +163,7 @@
 - (IBAction)onClearPressed:(id)sender
 {
   [loggedTimes removeAllObjects];
+  [self writeToLog];
   [self.tableView reloadData];
 }
 
@@ -174,7 +214,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  return [loggedTimes count];
+  return [self.loggedTimes count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -209,9 +249,8 @@
   [super viewDidLoad];
   
   isRunning = NO;
-  loggedTimes = [[NSMutableArray alloc] initWithObjects:nil];
   pauseTime = 0;
-  
+  [self.tableView reloadData];
   self.tableView.allowsMultipleSelectionDuringEditing = NO;
 }
 

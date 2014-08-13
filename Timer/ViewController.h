@@ -18,6 +18,7 @@
 @property (strong, nonatomic) NSTimer *stopWatchTimer;
 @property (strong, nonatomic) NSDate *startDate;
 @property (strong, nonatomic) NSDate *endDate;
+@property (strong, nonatomic) NSMutableArray *loggedTimes;
 
 @property (nonatomic, weak) IBOutlet UITableView *tableView;
 
